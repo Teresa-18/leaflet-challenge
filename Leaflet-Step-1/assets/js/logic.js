@@ -3,7 +3,7 @@ var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_we
 
 // Perform a GET request to the query URL
 d3.json(queryUrl, function(data) {
-
+  createFeatures(data.features);
   console.log(data.features); 
 });
 
@@ -19,7 +19,15 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
-  var earthquakes = L.geoJSON(earthquakeData, { // *** CALL the geoJSON function on the DATA
+  var earthquakes = L.geoJSON(earthquakeData, {
+    pointToLayer: function(feature, coordinates) {
+      return L.circle(coordinates, 
+        {fillOpacity: 0.75,
+        color: "black",
+        fillColor: depthColor(feature.geometry.coordinates[2]),
+        radius: (feature.properties.mag)*10000,
+      })
+    },
     onEachFeature: onEachFeaturePrep
   });
 
@@ -43,16 +51,7 @@ function createMap(earthquakes) {
     "Light Map": lightMap,
     
   };
-
-  for (var i = 0; i < earthquakes.length; i++) {
-    L.circle(feature[i].geometry.coordinates, {
-      stroke: false,
-      fillOpacity: 0.75,
-      color: "white",
-      fillColor: "white",
-      radius: markerSize((feature[i].properties.mag)*10000)
-    })
-  };
+  
   // Create our map, giving it the streetmap and earthquakes layers to display on load
   var myMap = L.map("map", {
     center: [
