@@ -5,28 +5,26 @@ var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_we
 d3.json(queryUrl, function(data) {
 
   console.log(data.features); 
-});
+
+  var magMarkers = [];
+
+  // Loop through locations and create city and state markers
+  for (var i = 0; i < data.length; i++) {
+    magMarkers.push(
+      L.circle(feature.geometry.coordinates, {
+        stroke: false,
+        fillOpacity: 0.75,
+        color: "white",
+        fillColor: "white",
+        radius: markerSize((feature.properties.mag)*10000)
+      }).bindPopup("<h3> Location: " + feature.properties.place +
+      "</h3><hr><p> Time: " + new Date(feature.properties.time) + "</p>"+
+      "</hr><hr><p> Magnitude: " + feature.properties.mag + "</p>")
+    );
+  };
+  var earthquakes = L.geoJSON(magMarkers);
 
 
-var magMarkers = [];
-
-// Loop through locations and create city and state markers
-for (var i = 0; i < data.length; i++) {
-  magMarkers.push(
-    L.circle(feature.geometry.coordinates, {
-      stroke: false,
-      fillOpacity: 0.75,
-      color: "white",
-      fillColor: "white",
-      radius: markerSize((feature.properties.mag)*10000)
-    }).bindPopup("<h3> Location: " + feature.properties.place +
-    "</h3><hr><p> Time: " + new Date(feature.properties.time) + "</p>"+
-    "</hr><hr><p> Magnitude: " + feature.properties.mag + "</p>")
-  );
-};
-var earthquakes = L.layerGroup(magMarkers);
-
-function createMap() {
 
   // Define streetmap and darkmap layers
   var streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
@@ -71,4 +69,4 @@ function createMap() {
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
-}
+}); 
