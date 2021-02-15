@@ -22,13 +22,15 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
   var earthquakes = L.geoJSON(earthquakeData, {
     pointToLayer: function (feature, coordinates) {
       return L.circle(coordinates, {
-        fillOpacity: 0.75,
-        color: "black",
-        fillColor: depthColor(feature.geometry.coordinates[2]),
-        radius: (feature.properties.mag) * 20000,
-      })
-    },
-    onEachFeature: onEachFeaturePrep
+      opacity: 1,
+      fillOpacity: 0.75,
+      color: "#000000",
+      fillColor: depthColor(feature.geometry.coordinates[2]),
+      radius: (feature.properties.mag) * 20000,
+      stroke: true,
+      weight: 0.5,
+    });
+  }, onEachFeature: onEachFeaturePrep
   });
   // Sending our earthquakes layer to the createMap function
   createMap(earthquakes);
@@ -36,7 +38,7 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
 
 
 function createMap(earthquakes) {
-  // Define streetmap and darkmap layers
+
   var lightMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
     attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
     tileSize: 512,
@@ -90,23 +92,27 @@ function createMap(earthquakes) {
     collapsed: false
   }).addTo(myMap);
 
-  var legend = L.control({
-    position: 'bottomright'
-  });
+  var legend = L.control({ position: 'bottomright' });
+  legend.onAdd = function (myMap) {
+    var div = L.DomUtil.create('div', 'info legend');
 
-  legend.onAdd = function(myMap) {
+    var depths = [-10, 10, 30, 50, 70, 90];
+    // var colors = ['#80ff00',
+    //     '#bfff00',
+    //     '#ffff00',
+    //     '#ffbf00',
+    //     '#ff8000',
+    //     '#ff4000'];
+    var labels = ['<strong>Earthquake Depth</strong>'];
 
-    var div = L.DomUtil.create('div', 'info legend'),
-      depth = [-10, 10, 30, 50, 70, 90],
-      labels = [];
-
-    // loop through our density intervals and generate a label with a colored square for each interval
-    for (var i = 0; i < depth.length; i++) {
+    for (var i = 0; i< depths.length; i++) {
       div.innerHTML +=
-        '<i style="background:' + depthColor(depth[i] + 1) + '"></i> ' +
-        depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
+      labels.push(
+        '<i class="rect" style="background:' + depthColor(depths[i]+1) + '"></i>' +
+        depths[i] + (depths[i + 1] ? '&ndash;' + depths[i + 1] + '<br>' : '+'));
     }
 
+      div.innerHTML = labels.join('<br>');
     return div;
   };
 
@@ -115,21 +121,22 @@ function createMap(earthquakes) {
 function depthColor(depth) {
   switch (true) {
     case depth > 90:
-      return '#ff8000';
+      return '#ff4000';
       break;
     case depth > 70:
       return '#ff8000';
       break;
     case depth > 50:
-      return '#ff8000';
+      return '#ffbf00';
       break;
     case depth > 30:
-      return '#ff8000';
+      return '#ffff00';
       break;
     case depth > 10:
-      return '#ff8000';
+      return '#bfff00';
     default:
-      return '#ff4000'
+      return '#80ff00'
   }
-};
+}
+
 
