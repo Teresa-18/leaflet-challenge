@@ -21,19 +21,21 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
   // Run the onEachFeature function once for each piece of data in the array
   var earthquakes = L.geoJSON(earthquakeData, {
     pointToLayer: function (feature, coordinates) {
-      return L.circle(coordinates,{
-          fillOpacity: 0.75,
-          color: "black",
-          fillColor: depthColor(feature.geometry.coordinates[2]),
-          radius: (feature.properties.mag) * 10000,
-        })
+      return L.circle(coordinates, {
+        fillOpacity: 0.75,
+        color: "black",
+        fillColor: depthColor(feature.geometry.coordinates[2]),
+        radius: (feature.properties.mag) * 20000,
+      })
     },
     onEachFeature: onEachFeaturePrep
   });
+  // Sending our earthquakes layer to the createMap function
+  createMap(earthquakes);
 }
 
 
-// function createMap(earthquakes) {
+function createMap(earthquakes) {
   // Define streetmap and darkmap layers
   var lightMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
     attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
@@ -84,56 +86,50 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
     layers: [outdoorsMap, earthquakes]
   });
 
+  L.control.layers(baseMaps, overlayMaps, {
+    collapsed: false
+  }).addTo(myMap);
 
   var legend = L.control({
     position: 'bottomright'
   });
 
-  legend.onAdd = function (Map) {
+  legend.onAdd = function(myMap) {
 
-  var div = L.DomUtil.create('div', 'info legend'),
-    depth = [feature.geometry.coordinates[2]];
-    labels = [
-      '#80ff00',
-      '#bfff00',
-      '#ffff00',
-      '#ffbf00',
-      '#ff8000',
-      '#ff4000'
-    ];
+    var div = L.DomUtil.create('div', 'info legend'),
+      depth = [-10, 10, 30, 50, 70, 90],
+      labels = [];
 
-  // loop through our density intervals and generate a label with a colored square for each interval
-  for (var i = 0; i < depth.length; i++) {
-    div.innerHTML +=
-      '<i style="background:' + depthColor(depth[i] + 1) + '"></i> ' +
-      depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
-  }
-
-  return div;
-  };
-
-  legend.addTo(Map);
-  } 
-
-  function depthColor(depth) {
-    switch (true) {
-      case depth > 90:
-        return '#ff8000';
-      case depth > 70:
-        return '#ff8000';
-      case depth > 50:
-        return '#ff8000';
-      case depth > 30:
-        return '#ff8000';
-      case depth > 10:
-        return '#ff8000';
-      default:
-        return '#ff4000'
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < depth.length; i++) {
+      div.innerHTML +=
+        '<i style="background:' + depthColor(depth[i] + 1) + '"></i> ' +
+        depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
     }
+
+    return div;
   };
 
-  L.control.layers(baseMaps, overlayMaps, {
-    collapsed: false
-  }).addTo(myMap);
-  
-// }
+  legend.addTo(myMap);
+}
+function depthColor(depth) {
+  switch (true) {
+    case depth > 90:
+      return '#ff8000';
+      break;
+    case depth > 70:
+      return '#ff8000';
+      break;
+    case depth > 50:
+      return '#ff8000';
+      break;
+    case depth > 30:
+      return '#ff8000';
+      break;
+    case depth > 10:
+      return '#ff8000';
+    default:
+      return '#ff4000'
+  }
+};
+
