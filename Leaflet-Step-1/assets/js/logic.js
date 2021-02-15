@@ -20,9 +20,8 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
   var earthquakes = L.geoJSON(earthquakeData, {
-    pointToLayer: function (feature, coordinates) {
-      return L.circle(coordinates,
-        {
+    layer: function (feature, latlng) {
+      return L.circle(latlng,{
           fillOpacity: 0.75,
           color: "black",
           fillColor: depthColor(feature.geometry.coordinates[2]),
@@ -34,7 +33,7 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
 
   // Sending our earthquakes layer to the createMap function
   createMap(earthquakes);
-};
+}
 
 
 function createMap(earthquakes) {
@@ -72,7 +71,11 @@ function createMap(earthquakes) {
     "Light Map": lightMap,
     "Satellite Map": satelliteMap,
     "Outdoors Map": outdoorsMap
+  };
 
+  // Create overlay object to hold our overlay layer
+  var overlayMaps = {
+    Earthquakes: earthquakes
   };
 
   // Create our map, giving it the streetmap and earthquakes layers to display on load
@@ -81,16 +84,18 @@ function createMap(earthquakes) {
       37.09, -95.71
     ],
     zoom: 5,
-    layers: [outdoors, earth]
+    layers: [outdoorsMap, earthquakes]
   });
 
 
-  var legend = L.control({ position: 'bottomright' });
+  var legend = L.control({
+    position: 'bottomright'
+  });
 
   legend.onAdd = function (myMap) {
 
-    var div = L.DomUtil.create('div', 'info legend'),
-      depth = [feature.geometry.coordinates[2]];
+  var div = L.DomUtil.create('div', 'info legend'),
+    depth = [feature.geometry.coordinates[2]];
     labels = [
       '#80ff00',
       '#bfff00',
@@ -100,37 +105,42 @@ function createMap(earthquakes) {
       '#ff4000'
     ];
 
-    // loop through our density intervals and generate a label with a colored square for each interval
-    for (var i = 0; i < depth.length; i++) {
-      div.innerHTML +=
-        '<i style="background:' + depthColor(depth[i] + 1) + '"></i> ' +
-        depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
-    }
+  // loop through our density intervals and generate a label with a colored square for each interval
+  for (var i = 0; i < depth.length; i++) {
+    div.innerHTML +=
+      '<i style="background:' + depthColor(depth[i] + 1) + '"></i> ' +
+      depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
+  }
 
-    return div;
+  return div;
   };
 
-  legend.addTo(myMap);
-}
+  // legend.addTo(myMap);
 
-function depthColor(depth) {
-  switch (true) {
-    case depth > 90:
-      return '#ff8000';
-      break;
-    case depth > 70:
-      return '#ff8000';
-      break;
-    case depth > 50:
-      return '#ff8000';
-      break;
-    case depth > 30:
-      return '#ff8000';
-      break;
-    case depth > 10:
-      return '#ff8000';
-      break;
-    default:
-      return '#ff4000'
-  }
+  function depthColor(depth) {
+    switch (true) {
+      case depth > 90:
+        return '#ff8000';
+        break;
+      case depth > 70:
+        return '#ff8000';
+        break;
+      case depth > 50:
+        return '#ff8000';
+        break;
+      case depth > 30:
+        return '#ff8000';
+        break;
+      case depth > 10:
+        return '#ff8000';
+        break;
+      default:
+        return '#ff4000'
+    }
+  };
+
+  L.control.layers(baseMaps, overlayMaps, {
+    collapsed: false
+  }).addTo(myMap);
+  
 }
