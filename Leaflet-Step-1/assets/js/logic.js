@@ -12,9 +12,9 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
   // Define a function we want to run once for each feature in the features array
   // Give each feature a popup describing the place and time of the earthquake
   function onEachFeaturePrep(feature, layer) { // **** GRAB only what is needed from the DATA *****
-    layer.bindPopup("<h3> Location: " + feature.properties.mag +
+    layer.bindPopup("<h3> Magnitude: " + feature.properties.mag +
       "</h3><hr><p> Time: " + new Date(feature.properties.time) + "</p>" +
-      "</hr><hr><p> Magnitude: " + feature.properties.place + "</p>");
+      "</hr><hr><p> Location: " + feature.properties.place + "</p>");
   }
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
@@ -97,12 +97,7 @@ function createMap(earthquakes) {
     var div = L.DomUtil.create('div', 'info legend');
 
     var depths = [-10, 10, 30, 50, 70, 90];
-    // var colors = ['#80ff00',
-    //     '#bfff00',
-    //     '#ffff00',
-    //     '#ffbf00',
-    //     '#ff8000',
-    //     '#ff4000'];
+
     var labels = ['<strong>Earthquake Depth</strong>'];
 
     for (var i = 0; i< depths.length; i++) {
