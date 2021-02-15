@@ -12,16 +12,16 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
   // Define a function we want to run once for each feature in the features array
   // Give each feature a popup describing the place and time of the earthquake
   function onEachFeaturePrep(feature, layer) { // **** GRAB only what is needed from the DATA *****
-    layer.bindPopup("<h3> Location: " + feature.properties.place +
+    layer.bindPopup("<h3> Location: " + feature.properties.mag +
       "</h3><hr><p> Time: " + new Date(feature.properties.time) + "</p>" +
-      "</hr><hr><p> Magnitude: " + feature.properties.mag + "</p>");
+      "</hr><hr><p> Magnitude: " + feature.properties.place + "</p>");
   }
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
   var earthquakes = L.geoJSON(earthquakeData, {
-    layer: function (feature, latlng) {
-      return L.circle(latlng,{
+    pointToLayer: function (feature, coordinates) {
+      return L.circle(coordinates,{
           fillOpacity: 0.75,
           color: "black",
           fillColor: depthColor(feature.geometry.coordinates[2]),
@@ -30,13 +30,10 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
     },
     onEachFeature: onEachFeaturePrep
   });
-
-  // Sending our earthquakes layer to the createMap function
-  createMap(earthquakes);
 }
 
 
-function createMap(earthquakes) {
+// function createMap(earthquakes) {
   // Define streetmap and darkmap layers
   var lightMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
     attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
@@ -92,7 +89,7 @@ function createMap(earthquakes) {
     position: 'bottomright'
   });
 
-  legend.onAdd = function (myMap) {
+  legend.onAdd = function (Map) {
 
   var div = L.DomUtil.create('div', 'info legend'),
     depth = [feature.geometry.coordinates[2]];
@@ -115,25 +112,21 @@ function createMap(earthquakes) {
   return div;
   };
 
-  // legend.addTo(myMap);
+  legend.addTo(Map);
+  } 
 
   function depthColor(depth) {
     switch (true) {
       case depth > 90:
         return '#ff8000';
-        break;
       case depth > 70:
         return '#ff8000';
-        break;
       case depth > 50:
         return '#ff8000';
-        break;
       case depth > 30:
         return '#ff8000';
-        break;
       case depth > 10:
         return '#ff8000';
-        break;
       default:
         return '#ff4000'
     }
@@ -143,4 +136,4 @@ function createMap(earthquakes) {
     collapsed: false
   }).addTo(myMap);
   
-}
+// }
