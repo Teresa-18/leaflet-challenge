@@ -1,6 +1,30 @@
 // Store our API endpoint inside queryUrl
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
+// Here we make an AJAX call to get our Tectonic Plate geoJSON data.
+var secondQueryUrl = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json";
+
+d3.json(secondQueryUrl,function(platedata) {
+  makeFeatures(platedata.features);
+  console.log(platedata.features);
+});
+
+function makeFeatures(tectonicData) { 
+
+  
+  function onEachFeaturePrep(feature, layer) { // **** GRAB only what is needed from the DATA *****
+    layer.bindPopup("<h3> Name: " + feature.properties.Name +
+      "</h3><hr><p> Layer: " + (feature.properties.LAYER) + "</p></hr>");
+  }
+
+  
+  var plates = L.geoJSON(tectonicData, {
+    onEachFeature: onEachFeaturePrep
+  });
+  // Sending our earthquakes layer to the createMap function
+  createMap(plates);
+}
+
 // Perform a GET request to the query URL
 d3.json(queryUrl, function (data) {
   createFeatures(data.features);
@@ -37,7 +61,7 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
 }
 
 
-function createMap(earthquakes) {
+function createMap(earthquakes, plates) {
 
   var lightMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
     attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
@@ -77,6 +101,7 @@ function createMap(earthquakes) {
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
     Earthquakes: earthquakes
+    Plates: plates
   };
 
   // Create our map, giving it the streetmap and earthquakes layers to display on load
@@ -85,7 +110,7 @@ function createMap(earthquakes) {
       37.09, -95.71
     ],
     zoom: 5,
-    layers: [outdoorsMap, earthquakes]
+    layers: [outdoorsMap, earthquakes, plates]
   });
 
   L.control.layers(baseMaps, overlayMaps, {
