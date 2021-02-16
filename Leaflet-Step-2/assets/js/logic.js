@@ -32,7 +32,7 @@ function makeFeatures(tectonicData) {
     // Give each feature a popup describing the place and time of the earthquake
     function onEachFeaturePrep(feature, layer) { // **** GRAB only what is needed from the DATA *****
       layer.bindPopup("<h3> Magnitude: " + feature.properties.mag +
-        "</h3><hr><p> Time: " + new Date(feature.properties.time) + "</p>" +
+        "</h3><hr><p> Depth: " + (feature.geometry.coordinates[2]) + "</p>" +
         "</hr><hr><p> Location: " + feature.properties.place + "</p>");
     }
 
