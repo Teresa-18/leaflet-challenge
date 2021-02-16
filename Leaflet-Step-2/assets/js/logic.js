@@ -12,17 +12,16 @@ d3.json(secondQueryUrl,function(platedata) {
 function makeFeatures(tectonicData) { 
 
   
-  function onEachFeaturePrep(feature, layer) { // **** GRAB only what is needed from the DATA *****
+  function onEachFeaturePrep(feature, layer) {
     layer.bindPopup("<h3> Name: " + feature.properties.Name +
       "</h3><hr><p> Layer: " + (feature.properties.LAYER) + "</p></hr>");
   }
 
-  
   var plates = L.geoJSON(tectonicData, {
     onEachFeature: onEachFeaturePrep
   });
   // Sending our earthquakes layer to the createMap function
-  createMap(plates);
+  createMap();
 }
 
 // Perform a GET request to the query URL
@@ -57,7 +56,7 @@ function createFeatures(earthquakeData) { // *** earthquakeData is the DATA comi
   }, onEachFeature: onEachFeaturePrep
   });
   // Sending our earthquakes layer to the createMap function
-  createMap(earthquakes);
+  createMap();
 }
 
 
@@ -100,7 +99,7 @@ function createMap(earthquakes, plates) {
 
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
-    Earthquakes: earthquakes
+    Earthquakes: earthquakes,
     Plates: plates
   };
 
