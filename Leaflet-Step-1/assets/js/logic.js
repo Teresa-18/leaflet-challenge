@@ -98,7 +98,7 @@ function createMap(earthquakes) {
 
     var depths = [-10, 10, 30, 50, 70, 90];
 
-    var labels = ['<strong>Earthquake Depth</strong>'];
+    var labels = ['<strong>Earthquake Depth</strong><br>'];
 
     for (var i = 0; i< depths.length; i++) {
       div.innerHTML +=

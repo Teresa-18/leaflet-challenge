@@ -13,6 +13,7 @@ body {
 
   .info{
     padding: 6px 8px;
+    padding-bottom: 15px;
     font: 14px/16px Arial, Helvetica, sans-serif;
     background: white;
     background: rgba(255, 255, 255, 0.8);
@@ -22,7 +23,7 @@ body {
 
   .legend{
     background-color: "black";
-    line-height: 25px;
+    line-height: 13px;
     color: #555;
     width: auto;
   }
